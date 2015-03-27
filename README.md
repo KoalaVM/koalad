@@ -1,3 +1,4 @@
+![alt text](http://dpr.clayfreeman.com/13XG1.jpg "KoalaVM")
 `koalad`
 ========
 
