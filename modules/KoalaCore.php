@@ -18,8 +18,10 @@
             base64_decode($data["signature"]));
           Logger::debug(var_export($info, true));
           if (is_array($info) && isset($info[0]["status"]) &&
-              isset($info[0]["fingerprint"]) && $info[0]["status"] == 0 &&
-              $info[0]["fingerprint"] == $this->fingerprint) {
+              isset($info[0]["fingerprint"]) && isset($info[0]["timestamp"]) &&
+              $info[0]["status"] == 0 &&
+              $info[0]["fingerprint"] == $this->fingerprint &&
+              abs(time() - $info[0]["timestamp"]) <= 300) {
             // Signature is valid and fingerprint matches master
             $found = 0;
             $event = EventHandling::getEventByName("koalaCommandEvent");
