@@ -87,6 +87,7 @@
       if ($pubkey != null) {
         $this->gpg = gnupg_init();
         $info = gnupg_import($this->gpg, $pubkey);
+        Logger::debug(var_export($info, true));
         if (is_array($info) && isset($info["fingerprint"])) {
           $this->fingerprint = $info["fingerprint"];
           EventHandling::createEvent("koalaCommandEvent", $this);
