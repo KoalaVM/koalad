@@ -23,7 +23,7 @@
           }
           else {
             return array(false, array(
-              "status"   => "406",
+              "status"   => "500",
               "message" => "Internal error: unable to shut down domain for ".
                 "the given name"
             ));
