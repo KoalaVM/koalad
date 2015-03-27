@@ -29,7 +29,7 @@
                   continue;
                 }
                 // Trigger the koalaCommand event for each registered module
-                EventHandling::triggerEvent("koalaCommandEvent", $id,
+                $status = EventHandling::triggerEvent("koalaCommandEvent", $id,
                     array($connection, $payload));
                 $connection->send(json_encode($status[1]));
                 $connection->disconnect();
