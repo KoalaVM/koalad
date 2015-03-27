@@ -20,8 +20,9 @@ Incoming messages must match the following JSON format:
 
 * `payload64` is a base-64 encoded JSON dictionary following [this](#payload64)
 format.
-* `signature` is the output from `payload64` piped into `gpg --detach-sig` or
-some equivalent detached signature process (e.g. `gnupg_sign(...)` in PHP).
+* `signature` is a base-64 encoded output from `payload64` piped into
+`gpg --detach-sig` or some equivalent detached signature process (e.g.
+`gnupg_sign(...)` in PHP).
 
 `payload64`
 ===========
