@@ -2,6 +2,7 @@
   class __CLASSNAME__ {
     public $depend = array("RawEvent");
     public $name = "KoalaCore";
+    private $fingerprint = null;
     private $gpg = null;
 
     public function receiveRaw($name, $data) {
@@ -15,9 +16,11 @@
         if (is_array($payload) && isset($payload["command"])) {
           $info = gnupg_verify($this->gpg, $data["payload64"],
             base64_decode($data["signature"]));
+          Logger::debug(var_export($info, true));
           if (is_array($info) && isset($info[0]["status"]) &&
-              $info[0]["status"] == 0) {
-            // Signature is valid
+              isset($info[0]["fingerprint"]) && $info[0]["status"] == 0 &&
+              $info[0]["fingerprint"] == $this->fingerprint) {
+            // Signature is valid and fingerprint matches master
             $found = 0;
             $event = EventHandling::getEventByName("koalaCommandEvent");
             if ($event != false && count($event[2]) > 0) {
@@ -83,12 +86,15 @@
       $pubkey = StorageHandling::loadFile($this, "gpg.pub");
       if ($pubkey != null) {
         $this->gpg = gnupg_init();
-        gnupg_import($this->gpg, $pubkey);
-        EventHandling::createEvent("koalaCommandEvent", $this);
-        EventHandling::registerForEvent("rawEvent", $this, "receiveRaw");
-        return true;
+        $info = gnupg_import($this->gpg, $pubkey);
+        if (is_array($info) && isset($info["fingerprint"])) {
+          $this->fingerprint = $info["fingerprint"];
+          EventHandling::createEvent("koalaCommandEvent", $this);
+          EventHandling::registerForEvent("rawEvent", $this, "receiveRaw");
+          return true;
+        }
       }
-      Logger::info("The master's public GPG key is required to load KoalaCore");
+      Logger::info("Failed to load the master's GPG public key for KoalaCore.");
       Logger::info("Place the public key in a file at data/KoalaCore/gpg.pub");
       return false;
     }
