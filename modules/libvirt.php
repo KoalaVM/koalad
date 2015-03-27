@@ -26,36 +26,47 @@
       if (is_array($config)) {
         Logger::debug(var_export($config, true));
         foreach ($config as $type => $info) {
-          $res = @libvirt_connect($info["uri"], $info["readonly"],
-            ($info["auth"] == true ? array(
-              VIR_CRED_AUTHNAME => $info["username"],
-              VIR_CRED_PASSPHRASE => $info["password"]
-            ) : array()));
-          if ($res != false) {
-            Logger::info("Initializing support for hypervisor type \"".$type.
-              "\"");
-            $this->hypervisor[$type] = $res;
+          if (is_array($info) && isset($info["enabled"]) &&
+              isset($info["uri"]) && isset($info["auth"]) &&
+              isset($info["username"]) && isset($info["password"])) {
+            if ($info["enabled"] == true) {
+              $res = @libvirt_connect($info["uri"], false,
+                ($info["auth"] == true ? array(
+                  VIR_CRED_AUTHNAME => $info["username"],
+                  VIR_CRED_PASSPHRASE => $info["password"]
+                ) : array()));
+              if ($res != false) {
+                Logger::info("Initializing support for hypervisor type \"".
+                  $type."\"");
+                $this->hypervisor[$type] = $res;
+              }
+              else {
+                Logger::info("Error connecting to hypervisor type \"".$type.
+                  "\" at URI \"".$info["uri"]."\"".($info["auth"] == true ?
+                  " with username \"".$info["username"]."\" and password \"".
+                  $info["password"]."\"" : null));
+              }
+            }
           }
           else {
-            Logger::info("Error connecting to hypervisor type \"".$type."\" ".
-              "at URI \"".$info["uri"]."\"".($info["auth"] == true ?
-              " with username \"".$info["username"]."\" and password \"".
-              $info["password"]."\"" : null));
+            Logger::info("Error loading config entry; check config at ".
+              "data/libvirt/config.json");
+            return false;
           }
         }
       }
       else {
         StorageHandling::saveFile($this, "config.json", json_encode(array(
           "kvm" => array(
+              "enabled"  => false,
               "uri"      => "qemu:///system",
-              "readonly" => false,
               "auth"     => false,
               "username" => "billy",
               "password" => "s3cr3tP455w0rd"
             ),
           "xen" => array(
+              "enabled"  => false,
               "uri"      => "xen:///",
-              "readonly" => false,
               "auth"     => false,
               "username" => "billy",
               "password" => "s3cr3tP455w0rd"
@@ -63,6 +74,7 @@
         ), JSON_PRETTY_PRINT));
         $this->loadConfig();
       }
+      return true;
     }
 
     public function lookupDomain($type, $name) {
@@ -73,8 +85,7 @@
     }
 
     public function isInstantiated() {
-      $this->loadConfig();
-      return true;
+      return $this->loadConfig();
     }
   }
 ?>
