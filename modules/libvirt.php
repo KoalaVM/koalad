@@ -15,9 +15,10 @@
     }
 
     public function lookupDomain($type, $name) {
-      if ($this->getConnection($type) == false)
+      $res = $this->getConnection($type);
+      if ($res == false)
         return false;
-      return libvirt_domain_lookup_by_name($this->getConnection($type), $name);
+      return libvirt_domain_lookup_by_name($res, $name);
     }
 
     public function isInstantiated() {
