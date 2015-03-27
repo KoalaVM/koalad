@@ -39,7 +39,7 @@
             if ($found == 0) {
               // Unknown command
               $connection->send(json_encode(array(
-                "error"   => "403",
+                "status"   => "403",
                 "message" => "Unknown command: the requested command does ".
                   "not exist or could not be found"
               )));
@@ -49,7 +49,7 @@
           else {
             // Invalid signature
             $connection->send(json_encode(array(
-              "error"   => "402",
+              "status"   => "402",
               "message" => "Invalid signature: the provided payload could ".
                 "not be authenticated by the provided signature"
             )));
@@ -59,7 +59,7 @@
         else {
           // Error unpacking payload
           $connection->send(json_encode(array(
-            "error"   => "401",
+            "status"   => "401",
             "message" => "Error processing payload64: payload64 should be ".
               "formatted as outlined at https://github.com/KoalaVM/koalad/blob".
               "/master/README.md#payload64"
@@ -70,7 +70,7 @@
       else {
         // Malformed request
         $connection->send(json_encode(array(
-          "error"   => "400",
+          "status"   => "400",
           "message" => "Malformed request: requests should be formatted as ".
             "outlined at https://github.com/KoalaVM/koalad/blob/master/README.".
             "md#message-structure"
