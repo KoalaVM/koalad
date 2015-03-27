@@ -88,6 +88,8 @@
         EventHandling::registerForEvent("rawEvent", $this, "receiveRaw");
         return true;
       }
+      Logger::info("The master's public GPG key is required to load KoalaCore");
+      Logger::info("Place the public key in a file at data/KoalaCore/gpg.pub");
       return false;
     }
   }
