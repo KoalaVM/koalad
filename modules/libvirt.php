@@ -24,6 +24,7 @@
       $config = @json_decode(StorageHandling::loadFile($this, "config.json"),
         true);
       if (is_array($config)) {
+        Logger::debug(var_export($config, true));
         foreach ($config as $type => $info) {
           $res = @libvirt_connect($info["uri"], $info["readonly"],
             ($info["auth"] == true ? array(

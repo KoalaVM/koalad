@@ -86,7 +86,7 @@
 
     public function isInstantiated() {
       $pubkey = StorageHandling::loadFile($this, "gpg.pub");
-      if ($pubkey != null) {
+      if ($pubkey != false && $pubkey != null) {
         $this->gpg = gnupg_init();
         $info = gnupg_import($this->gpg, $pubkey);
         Logger::debug(var_export($info, true));
@@ -97,6 +97,7 @@
           return true;
         }
       }
+      StorageHandling::saveFile($this, "gpg.pub");
       Logger::info("Failed to load the master's GPG public key for KoalaCore.");
       Logger::info("Place the public key in a file at data/KoalaCore/gpg.pub");
       return false;
