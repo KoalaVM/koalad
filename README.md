@@ -1,10 +1,10 @@
 `koalad`
 ========
 
-koalad is the daemon responsible for managing virtualization servers.  koalad
-uses a JSON-based API on SSL port `3654` by default.  Incoming messages are
-signed with GPG by the connecting client (e.g. a management panel) and verified
-by the GPG public key located at `data/KoalaCore/gpg.pub`.
+`koalad` is the daemon responsible for managing virtualization servers.  
+`koalad` uses a JSON-based API on SSL port `3654` by default.  Incoming messages
+are signed with GPG by the connecting client (e.g. a management panel) and
+verified by the GPG public key located at `data/KoalaCore/gpg.pub`.
 
 Message Structure
 =================
