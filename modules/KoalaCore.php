@@ -29,13 +29,10 @@
                   continue;
                 }
                 // Trigger the koalaCommand event for each registered module
-                $status = EventHandling::triggerEvent("koalaCommandEvent", $id,
+                EventHandling::triggerEvent("koalaCommandEvent", $id,
                     array($connection, $payload));
-                if ($status[0] == false) {
-                  // Unknown command
-                  $connection->send(json_encode($status[1]));
-                  $connection->disconnect();
-                }
+                $connection->send(json_encode($status[1]));
+                $connection->disconnect();
                 $found++;
               }
             }
