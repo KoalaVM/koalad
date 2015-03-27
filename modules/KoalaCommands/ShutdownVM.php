@@ -14,18 +14,27 @@
         $domain = $this->libvirt->lookupDomain($payload["data"]["type"],
           $payload["data"]["name"]);
         if ($domain != false) {
-          if (@libvirt_domain_destroy($domain)) {
-            return array(true, array(
-              "status"  => "200",
-              "message" => "Success: the domain for the given name has been ".
-                "shut down"
-            ));
+          if (libvirt_domain_is_active($domain)) {
+            if (libvirt_domain_destroy($domain)) {
+              return array(true, array(
+                "status"  => "200",
+                "message" => "Success: the domain for the given name has been ".
+                  "shut down"
+              ));
+            }
+            else {
+              return array(false, array(
+                "status"   => "500",
+                "message" => "Internal error: unable to shut down domain for ".
+                  "the given name"
+              ));
+            }
           }
           else {
             return array(false, array(
-              "status"   => "500",
-              "message" => "Internal error: unable to shut down domain for ".
-                "the given name"
+              "status"   => "300",
+              "message" => "Not modified: the requested domain was already ".
+                "inactive"
             ));
           }
         }
