@@ -80,11 +80,15 @@
     }
 
     public function isInstantiated() {
-      $this->gpg = gnupg_init();
-      gnupg_import($this->gpg, StorageHandling::loadFile($this, "gpg.pub"));
-      EventHandling::createEvent("koalaCommandEvent", $this);
-      EventHandling::registerForEvent("rawEvent", $this, "receiveRaw");
-      return true;
+      $pubkey = StorageHandling::loadFile($this, "gpg.pub");
+      if ($pubkey != null) {
+        $this->gpg = gnupg_init();
+        gnupg_import($this->gpg, $pubkey);
+        EventHandling::createEvent("koalaCommandEvent", $this);
+        EventHandling::registerForEvent("rawEvent", $this, "receiveRaw");
+        return true;
+      }
+      return false;
     }
   }
 ?>
