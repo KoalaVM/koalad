@@ -16,7 +16,7 @@
             $payload["data"]["name"]);
           if ($domain != false) {
             if (@libvirt_domain_is_active($domain)) {
-              if (@libvirt_domain_destroy($domain)) {
+              if (@libvirt_domain_shutdown($domain)) {
                 return array(true, array(
                   "status"  => "200",
                   "message" => "Success: the domain for the given name has ".
