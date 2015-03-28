@@ -34,7 +34,7 @@ considered invalid.
 ```json
 {
   "command": "...",
-  "data":    <data>
+  <...>
 }
 ```
 
