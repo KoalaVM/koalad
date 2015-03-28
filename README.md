@@ -39,4 +39,4 @@ considered invalid.
 ```
 
 * `command` is a string containing the name of the command to execute.
-* `data` is an optional *protocol agnostic* type of data that `command` expects.
+* Optional *protocol agnostic* data that `command` expects can also be included.
