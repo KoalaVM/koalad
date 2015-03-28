@@ -1,4 +1,4 @@
-![KoalaVM](http://dpr.clayfreeman.com/1iXoR+ "KoalaVM")
+![KoalaVM](http://dpr.clayfreeman.com/VM8Y+ "KoalaVM")
 
 `koalad`
 ========
