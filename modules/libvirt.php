@@ -77,6 +77,25 @@
       return true;
     }
 
+    public function listDomains($filter = null) {
+      $return = array();
+      if ($filter == null) {
+        $filter = $this->getConnectionTypes();
+      }
+      else if (!is_array($filter)) {
+        $filter = array($filter);
+      }
+      foreach (array_intersect($this->getConnectionTypes(), $filter) as $type) {
+        if (isset($this->hypervisor[$type])) {
+          $domains = libvirt_list_domains($this->getConnection($type));
+          if (is_array($domains) && count($domains) > 0) {
+            $return[$type] = $domains;
+          }
+        }
+      }
+      return (count($return) > 0 ? $return : false);
+    }
+
     public function lookupDomain($type, $name) {
       if (isset($this->hypervisor[$type]))
         return @libvirt_domain_lookup_by_name($this->getConnection($type),
