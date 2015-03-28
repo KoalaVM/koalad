@@ -22,7 +22,7 @@ Incoming messages must match the following JSON format:
 
 * `payload64` is a base-64 encoded JSON dictionary following [this](#payload64)
 format.
-* `signature` is a base-64 encoded output from `gnupg_sign(...)` in PHP.
+* `signature` is a base-64 detached signature from `gnupg_sign(...)` in PHP.
 Any given signature must be no older than 5 minutes (300 seconds) or it will be
 considered invalid.
 
