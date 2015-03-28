@@ -9,8 +9,8 @@
       $connection = $data[0];
       $data = json_decode($data[1], true);
 
-      if (isset($data["payload64"]) && isset($data["signature"]) &&
-          count($data) == 2) {
+      if (is_array($data) && isset($data["payload64"]) &&
+          isset($data["signature"]) && count($data) == 2) {
         // Unpack payload
         $payload = json_decode(base64_decode($data["payload64"]), true);
         if (is_array($payload) && isset($payload["command"])) {
@@ -44,7 +44,7 @@
             if ($found == 0) {
               // Unknown command
               $connection->send(json_encode(array(
-                "status"   => "403",
+                "status"  => "403",
                 "message" => "Unknown command: the requested command does ".
                   "not exist or could not be found"
               )));
@@ -54,7 +54,7 @@
           else {
             // Invalid signature
             $connection->send(json_encode(array(
-              "status"   => "402",
+              "status"  => "402",
               "message" => "Invalid signature: the provided payload could ".
                 "not be authenticated by the provided signature"
             )));
@@ -64,7 +64,7 @@
         else {
           // Error unpacking payload
           $connection->send(json_encode(array(
-            "status"   => "401",
+            "status"  => "401",
             "message" => "Error processing payload64: payload64 should be ".
               "formatted as outlined at https://github.com/KoalaVM/koalad/blob".
               "/master/README.md#payload64"
@@ -75,7 +75,7 @@
       else {
         // Malformed request
         $connection->send(json_encode(array(
-          "status"   => "400",
+          "status"  => "400",
           "message" => "Malformed request: requests should be formatted as ".
             "outlined at https://github.com/KoalaVM/koalad/blob/master/README.".
             "md#message-structure"
@@ -97,7 +97,7 @@
           return true;
         }
       }
-      StorageHandling::saveFile($this, "gpg.pub");
+      StorageHandling::saveFile($this, "gpg.pub", null);
       Logger::info("Failed to load the master's GPG public key for KoalaCore.");
       Logger::info("Place the public key in a file at data/KoalaCore/gpg.pub");
       return false;
