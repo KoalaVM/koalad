@@ -26,13 +26,11 @@
           "domains" => json_encode($domains)
         ));
       }
-      else {
-        return array(false, array(
-          "status"      => "404",
-          "message"     => "Not found: no domains were found".($filter != null ?
-            " with the provided filter" : null)
-        ));
-      }
+      return array(false, array(
+        "status"      => "404",
+        "message"     => "Not found: no domains were found".($filter != null ?
+          " with the provided filter" : null)
+      ));
     }
 
     public function isInstantiated() {

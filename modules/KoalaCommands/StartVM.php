@@ -8,58 +8,53 @@
       $connection = $data[0];
       $payload = $data[1];
 
-      if (isset($payload["data"]) && is_array($payload["data"]) &&
-          count($payload["data"]) == 2 && isset($payload["data"]["type"]) &&
-          isset($payload["data"]["name"])) {
-        if ($this->libvirt->getConnected($payload["data"]["type"]) != false) {
-          $domain = $this->libvirt->lookupDomain($payload["data"]["type"],
-            $payload["data"]["name"]);
-          if ($domain != false) {
-            if (!@libvirt_domain_is_active($domain)) {
-              if (@libvirt_domain_create($domain)) {
-                return array(true, array(
-                  "status"  => "200",
-                  "message" => "Success: started the domain for the given name"
-                ));
-              }
-              else {
-                return array(false, array(
-                  "status"   => "501",
-                  "message" => "Internal error: unable to start domain for ".
-                    "the given name"
-                ));
-              }
-            }
-            else {
-              return array(false, array(
-                "status"   => "300",
-                "message" => "Not modified: the requested domain was already ".
-                  "active"
-              ));
-            }
-          }
-          else {
-            return array(false, array(
-              "status"   => "405",
-              "message" => "Invalid name: no such domain for the given name"
-            ));
-          }
-        }
-        else {
-          return array(false, array(
-            "status"   => "500",
-            "message" => "Internal error: the provided hypervisor type is not ".
-              "supported"
-          ));
-        }
-      }
-      else {
+      if (!isset($payload["data"]) || !is_array($payload["data"]) ||
+          count($payload["data"]) != 2 || !isset($payload["data"]["type"]) ||
+          !isset($payload["data"]["name"])) {
         return array(false, array(
           "status"   => "404",
           "message" => "Invalid payload: the minimum required data for this ".
             "request was not provided"
         ));
       }
+
+      if ($this->libvirt->getConnected($payload["data"]["type"]) == false) {
+        return array(false, array(
+          "status"   => "500",
+          "message" => "Internal error: the provided hypervisor type is not ".
+            "supported"
+        ));
+      }
+
+      $domain = $this->libvirt->lookupDomain($payload["data"]["type"],
+        $payload["data"]["name"]);
+      if ($domain == false) {
+        return array(false, array(
+          "status"   => "405",
+          "message" => "Invalid name: no such domain for the given name"
+        ));
+      }
+
+      if (@libvirt_domain_is_active($domain)) {
+        return array(false, array(
+          "status"   => "300",
+          "message" => "Not modified: the requested domain was already ".
+            "active"
+        ));
+      }
+
+      if (@libvirt_domain_create($domain)) {
+        return array(true, array(
+          "status"  => "200",
+          "message" => "Success: started the domain for the given name"
+        ));
+      }
+
+      return array(false, array(
+        "status"   => "501",
+        "message" => "Internal error: unable to start domain for ".
+          "the given name"
+      ));
     }
 
     public function isInstantiated() {
