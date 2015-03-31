@@ -11,8 +11,14 @@
     }
 
     private function getConnection($type) {
-      if (isset($this->hypervisor[$type]))
-        return $this->hypervisor[$type];
+      if (isset($this->hypervisor[$type][0]))
+        return $this->hypervisor[$type][0];
+      return false;
+    }
+
+    private function getConnectionInfo($type) {
+      if (isset($this->hypervisor[$type][1]))
+        return $this->hypervisor[$type][1];
       return false;
     }
 
@@ -38,7 +44,7 @@
               if ($res != false) {
                 Logger::info("Initializing support for hypervisor type \"".
                   $type."\"");
-                $this->hypervisor[$type] = $res;
+                $this->hypervisor[$type] = array($res, $info);
               }
               else {
                 Logger::info("Error connecting to hypervisor type \"".$type.
