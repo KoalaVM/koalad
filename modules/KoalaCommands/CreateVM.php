@@ -1,7 +1,7 @@
 <?php
   class __CLASSNAME__ {
     public $depend = array("KoalaCore", "libvirt");
-    public $name = "InstallVM";
+    public $name = "CreateVM";
     private $libvirt = null;
 
     public function receiveKoalaCommand($name, $data) {
@@ -40,7 +40,7 @@
       }
 
       if (!is_numeric($payload["data"]["mem"]) ||
-          $payload["data"]["cores"] < 64) {
+          $payload["data"]["mem"] < 64) {
         return array(false, array(
           "status"  => "406",
           "message" => "Invalid memory size: at least 64 mebibytes must be ".
@@ -56,27 +56,23 @@
         ));
       }
 
-      $name = $this->libvirt->createDomain($payload["data"]);
-      if ($name != false) {
+      $name = $this->libvirt->createDomain($payload["data"]["type"],
+        $payload["data"]);
+      if (!is_array($name)) {
         return array(true, array(
           "status"  => "200",
           "message" => "Success: a VM with the requested specifications was ".
-            "installed"
+            "created",
           "name"    => $name
-        ))
+        ));
       }
-
-      return array(false, array(
-        "status"  => "501",
-        "message" => "Internal error: a VM with the requested specifications ".
-          "could not be created"
-      ))
+      return $name;
     }
 
     public function isInstantiated() {
       $this->libvirt = ModuleManagement::getModuleByName("libvirt");
       EventHandling::registerForEvent("koalaCommandEvent", $this,
-        "receiveKoalaCommand", "InstallVM");
+        "receiveKoalaCommand", "CreateVM");
       return true;
     }
   }
