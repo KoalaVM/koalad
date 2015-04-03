@@ -153,6 +153,10 @@
             "data/libvirt/config.json");
           return false;
         }
+
+        if (count($this->hypervisor) < 1)
+          Logger::info("No hypervisors are enabled; check config at ".
+            "data/libvirt/config.json");
       }
       else {
         StorageHandling::saveFile($this, "config.json", json_encode(array(
