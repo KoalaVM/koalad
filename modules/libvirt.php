@@ -32,7 +32,7 @@
 
       $command = "lvcreate -L ".intval($specs["disk"])."G ".
         escapeshellarg("-n".$name."_img")." ".$this->volgrp;
-      if (!preg_match("/^Logical volume \"(.*)\" created$/", trim(
+      if (!preg_match("/Logical volume \"(.*)\" created/", trim(
           @shell_exec($command." 2>&1"))) || !file_exists(
           "/dev/".$this->volgrp."/".$name."_img"))
         // Disk creation failed
