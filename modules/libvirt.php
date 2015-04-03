@@ -33,7 +33,7 @@
       $command = "lvcreate -L ".intval($specs["disk"])."G ".
         escapeshellarg("-n".$name."_img")." ".$this->volgrp;
       if (!preg_match("/^Logical volume \"(.*)\" created$/", trim(
-          @shell_exec($command." > /dev/null 2>&1"))) || !file_exists(
+          @shell_exec($command." 2>&1"))) || !file_exists(
           "/dev/".$this->volgrp."/".$name."_img"))
         // Disk creation failed
         return array(false, array(
@@ -47,7 +47,7 @@
         "_img")." --hvm --import --memory ".intval($specs["mem"])." --name ".
         escapeshellarg($name)." --noautoconsole --noreboot --vcpus ".
         intval($specs["cores"])." --virt-type ".escapeshellarg($type);
-      if (strstr(@shell_exec($command." > /dev/null 2>&1"),
+      if (strstr(@shell_exec($command." 2>&1"),
           "Domain creation completed.") &&
           $this->lookupDomain($type, $name) != false)
         return $name;
