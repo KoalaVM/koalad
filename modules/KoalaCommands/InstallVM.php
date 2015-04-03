@@ -10,16 +10,13 @@
 
       if (!isset($payload["data"]) ||
           !is_array($payload["data"]) ||
+          count($payload["data"]) != 4 ||
           !isset($payload["data"]["type"]) ||
-          !isset($payload["data"]["name"]) ||
           !isset($payload["data"]["cores"]) ||
           !isset($payload["data"]["mem"]) ||
-          !isset($payload["data"]["disk"]) ||
-          !isset($payload["data"]["vncpass"]) ||
-          !isset($payload["data"]["iso"]) ||
-          !isset($payload["data"]["auto"])) {
+          !isset($payload["data"]["disk"])) {
         return array(false, array(
-          "status"   => "404",
+          "status"  => "404",
           "message" => "Invalid payload: the minimum required data for this ".
             "request was not provided"
         ));
@@ -27,33 +24,16 @@
 
       if ($this->libvirt->getConnected($payload["data"]["type"]) == false) {
         return array(false, array(
-          "status"   => "500",
+          "status"  => "500",
           "message" => "Internal error: the provided hypervisor type is not ".
             "supported"
-        ));
-      }
-
-      if (!preg_match("/^[a-z]+[a-z0-9]*$/i", $payload["data"]["name"])) {
-        return array(false, array(
-          "status"   => "405",
-          "message" => "Invalid name: names must match an alphanumeric ".
-            "sequence of characters and begin with a non-digit"
-        ));
-      }
-
-      if ($this->libvirt->lookupDomain($payload["data"]["type"],
-          $payload["data"]["name"]) != false) {
-        return array(false, array(
-          "status"   => "406",
-          "message" => "Invalid name: another domain already exists by the ".
-            "provided name"
         ));
       }
 
       if (!is_numeric($payload["data"]["cores"]) ||
           $payload["data"]["cores"] < 1) {
         return array(false, array(
-          "status"   => "407",
+          "status"  => "405",
           "message" => "Invalid CPU count: at least one CPU core must be ".
             "provided"
         ));
@@ -62,7 +42,7 @@
       if (!is_numeric($payload["data"]["mem"]) ||
           $payload["data"]["cores"] < 64) {
         return array(false, array(
-          "status"   => "408",
+          "status"  => "406",
           "message" => "Invalid memory size: at least 64 mebibytes must be ".
             "provided"
         ));
@@ -71,19 +51,26 @@
       if (!is_numeric($payload["data"]["disk"]) ||
           $payload["data"]["cores"] < 0) {
         return array(false, array(
-          "status"   => "409",
+          "status"  => "407",
           "message" => "Invalid disk size: disk cannot be negative in size"
         ));
       }
 
-      // Check disk conflicts
-
-      if (strlen($payload["data"]["vncpass"]) < 8) {
-        return array(false, array(
-          "status"   => "410",
-          "message" => "Invalid VNC password: length is less than 8 characters"
-        ));
+      $name = $this->libvirt->createDomain($payload["data"]);
+      if ($name != false) {
+        return array(true, array(
+          "status"  => "200",
+          "message" => "Success: a VM with the requested specifications was ".
+            "installed"
+          "name"    => $name
+        ))
       }
+
+      return array(false, array(
+        "status"  => "501",
+        "message" => "Internal error: a VM with the requested specifications ".
+          "could not be created"
+      ))
     }
 
     public function isInstantiated() {

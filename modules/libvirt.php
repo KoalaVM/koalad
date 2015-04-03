@@ -4,6 +4,10 @@
     public $name = "libvirt";
     private $hypervisor = array();
 
+    public function createDomain($type, $specs) {
+      //
+    }
+
     public function getConnected($type) {
       if (isset($this->hypervisor[$type]))
         return true;
@@ -63,20 +67,25 @@
       }
       else {
         StorageHandling::saveFile($this, "config.json", json_encode(array(
-          "kvm" => array(
+          "options" => array(
+            "volgrp" => "vol_grp1"
+          ),
+          "hypervisors" => array(
+            "kvm" => array(
               "enabled"  => false,
               "uri"      => "qemu:///system",
               "auth"     => false,
               "username" => "billy",
               "password" => "s3cr3tP455w0rd"
             ),
-          "xen" => array(
+            "xen" => array(
               "enabled"  => false,
               "uri"      => "xen:///",
               "auth"     => false,
               "username" => "billy",
               "password" => "s3cr3tP455w0rd"
             )
+          )
         ), JSON_PRETTY_PRINT));
         $this->loadConfig();
       }
