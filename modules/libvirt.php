@@ -26,7 +26,7 @@
       if ($name == null)
         // Name selection failed
         return array(false, array(
-          "status"  => "502",
+          "status"  => "501",
           "message" => "Internal error: a suitable name could not be selected"
         ));
 
@@ -37,7 +37,7 @@
           "/dev/".$this->volgrp."/".$name."_img"))
         // Disk creation failed
         return array(false, array(
-          "status"  => "503",
+          "status"  => "502",
           "message" => "Internal error: logical volume creation failed"
         ));
 
@@ -55,7 +55,7 @@
       Logger::debug($name);
       Logger::debug(var_export($this->listDomains($type), true));
       return array(false, array(
-        "status"  => "504",
+        "status"  => "503",
         "message" => "Internal error: domain creation failed"
       ));
     }
@@ -83,6 +83,7 @@
     }
 
     private function loadConfig() {
+      $this->hypervisor = array();
       $config = @json_decode(StorageHandling::loadFile($this, "config.json"),
         true);
       if (is_array($config)) {
@@ -212,7 +213,15 @@
       return false;
     }
 
+    public function reloadConfig($name, $data) {
+      if (!$this->loadConfig()) {
+        Logger::info("Failed to reload configuration");
+        getMain()->shutdown();
+      }
+    }
+
     public function isInstantiated() {
+      EventHandling::registerForEvent("backgroundEvent", $this, "reloadConfig");
       return $this->loadConfig();
     }
   }
