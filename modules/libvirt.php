@@ -7,8 +7,9 @@
 
     public function createDomain($type, $specs) {
       if ($this->getConnected($type) == false || !is_array($specs) ||
-          !isset($specs["cores"]) || !isset($specs["mem"]) ||
-          !isset($specs["disk"]))
+          !isset($specs["cores"]) || !is_numeric($specs["cores"]) ||
+          !isset($specs["mem"]) || !is_numeric($specs["mem"]) ||
+          !isset($specs["disk"]) || !is_numeric($specs["disk"]))
         return array(false, array(
           "status"  => "408",
           "message" => "Invalid payload: the minimum required data for this ".
