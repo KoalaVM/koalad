@@ -90,6 +90,30 @@
       if (is_array($config)) {
         Logger::debug(var_export($config, true));
         if (isset($config["options"]) && is_array($config["options"])) {
+          if (isset($config["options"]["isopath"]) &&
+              strlen($config["options"]["isopath"]) > 0) {
+            if (preg_match("/^[a-z]+[a-z0-9_]*$/i",
+                $config["options"]["isopath"])) {
+              if (is_dir($config["options"]["isopath"]))
+                $this->isopath = $config["options"]["isopath"];
+              else {
+                Logger::info("Inexistent isopath; check config at ".
+                  "data/libvirt/config.json");
+                return false;
+              }
+            }
+            else {
+              Logger::info("Insecure isopath (must match regex ".
+                "\"/^[a-z]+[a-z0-9_]*$/i\"); check config at ".
+                "data/libvirt/config.json");
+              return false;
+            }
+          }
+          else {
+            Logger::info("Error loading isopath option; check config at ".
+              "data/libvirt/config.json");
+            return false;
+          }
           if (isset($config["options"]["volgrp"]) &&
               strlen($config["options"]["volgrp"]) > 0) {
             if (preg_match("/^[a-z]+[a-z0-9_]*$/i",
@@ -164,7 +188,8 @@
       else {
         StorageHandling::saveFile($this, "config.json", json_encode(array(
           "options" => array(
-            "volgrp" => "vol_grp1"
+            "isopath" => "/var/lib/libvirt/images",
+            "volgrp"  => "vol_grp1"
           ),
           "hypervisors" => array(
             "kvm" => array(
@@ -219,6 +244,42 @@
         Logger::info("Failed to reload configuration");
         getMain()->shutdown();
       }
+    }
+
+    public function setISO($type, $name, $iso) {
+      $domain = $this->lookupDomain($type, $name);
+      if ($domain == false) {
+        return array(false, array(
+          "status"  => "406",
+          "message" => "Invalid payload: the minimum required data for this ".
+            "request was not provided"
+        ));
+      }
+
+      $iso = realpath($this->isopath."/".$iso);
+      if (substr($iso, 0, strlen($this->isopath)) != $this->isopath ||
+          !file_exists($iso) || !is_readable($iso)) {
+        if ($iso != null) {
+          return array(false, array(
+            "status"  => "407",
+            "message" => "Invalid ISO: the provided ISO does not exist or ".
+              "could not be accessed"
+          ));
+        }
+      }
+
+      if (libvirt_domain_update_device($domain,
+          "<disk type='block' device='cdrom'>".
+            "<driver type='raw' cache='none' io='native'/>".
+            ($iso != null ? "<source dev=".escapeshellarg($iso)." />" : null).
+            "<target dev='hdc' bus='ide'/>".
+            "<readonly />".
+          "</disk>", VIR_DOMAIN_DEVICE_MODIFY_CONFIG))
+        return true;
+      return array(false, array(
+        "status"  => "501",
+        "message" => "Internal error: the requested ISO could not be mounted"
+      ));
     }
 
     public function isInstantiated() {
