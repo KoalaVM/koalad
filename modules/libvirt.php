@@ -250,7 +250,7 @@
       $iso = realpath($this->isopath."/".$iso);
       if (substr($iso, 0, strlen($this->isopath)) != $this->isopath ||
           !file_exists($iso) || !is_readable($iso)) {
-        if ($iso != null) {
+        if ($iso != $this->isopath) {
           return array(false, array(
             "status"  => "407",
             "message" => "Invalid ISO: the provided ISO does not exist or ".
@@ -259,13 +259,16 @@
         }
       }
 
+      $update = (@libvirt_domain_is_active($domain) ?
+        VIR_DOMAIN_DEVICE_MODIFY_LIVE : VIR_DOMAIN_DEVICE_MODIFY_CONFIG);
       if (libvirt_domain_update_device($domain,
           "<disk type='block' device='cdrom'>".
             "<driver type='raw' cache='none' io='native'/>".
-            ($iso != null ? "<source dev=".escapeshellarg($iso)." />" : null).
-            "<target dev='hdc' bus='ide'/>".
+            ($iso != $this->isopath ? "<source dev=".
+              escapeshellarg($iso)." />" : null).
+            "<target dev='hda' bus='ide'/>".
             "<readonly />".
-          "</disk>", VIR_DOMAIN_DEVICE_MODIFY_CONFIG))
+          "</disk>", $update))
         return true;
       return array(false, array(
         "status"  => "501",
