@@ -92,19 +92,10 @@
         if (isset($config["options"]) && is_array($config["options"])) {
           if (isset($config["options"]["isopath"]) &&
               strlen($config["options"]["isopath"]) > 0) {
-            if (preg_match("/^[a-z]+[a-z0-9_]*$/i",
-                $config["options"]["isopath"])) {
-              if (is_dir($config["options"]["isopath"]))
-                $this->isopath = $config["options"]["isopath"];
-              else {
-                Logger::info("Inexistent isopath; check config at ".
-                  "data/libvirt/config.json");
-                return false;
-              }
-            }
+            if (is_dir($config["options"]["isopath"]))
+              $this->isopath = $config["options"]["isopath"];
             else {
-              Logger::info("Insecure isopath (must match regex ".
-                "\"/^[a-z]+[a-z0-9_]*$/i\"); check config at ".
+              Logger::info("Inexistent isopath; check config at ".
                 "data/libvirt/config.json");
               return false;
             }
