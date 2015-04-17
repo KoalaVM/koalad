@@ -54,6 +54,8 @@
         return $name;
 
       Logger::debug($name);
+      Logger::debug(var_export($command, true));
+      Logger::debug(var_export($this->lookupDomain($type, $name), true));
       Logger::debug(var_export($this->listDomains($type), true));
       return array(false, array(
         "status"  => "503",
