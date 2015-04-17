@@ -35,12 +35,14 @@
         escapeshellarg("-n".$name."_img")." ".$this->volgrp;
       if (!preg_match("/Logical volume \"(.*)\" created/", trim(
           @shell_exec($command." 2>&1"))) || !file_exists(
-          "/dev/".$this->volgrp."/".$name."_img"))
+          "/dev/".$this->volgrp."/".$name."_img")) {
         // Disk creation failed
+        Logger::debug(var_export($command, true));
         return array(false, array(
           "status"  => "502",
           "message" => "Internal error: logical volume creation failed"
         ));
+      }
 
       $command = "virt-install --boot hd,cdrom --connect ".
         escapeshellarg($this->hypervisor[$type][1]["uri"])." --disk ".
