@@ -188,14 +188,14 @@
           ),
           "hypervisors" => array(
             "kvm" => array(
-              "enabled"  => false,
+              "enabled"  => true,
               "uri"      => "qemu:///system",
               "auth"     => false,
               "username" => "billy",
               "password" => "s3cr3tP455w0rd"
             ),
             "xen" => array(
-              "enabled"  => false,
+              "enabled"  => true,
               "uri"      => "xen:///",
               "auth"     => false,
               "username" => "billy",
