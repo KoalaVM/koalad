@@ -49,7 +49,7 @@
       }
 
       if (!is_numeric($payload["data"]["disk"]) ||
-          $payload["data"]["cores"] < 0) {
+          $payload["data"]["disk"] < 0) {
         return array(false, array(
           "status"  => "407",
           "message" => "Invalid disk size: disk cannot be negative in size"
